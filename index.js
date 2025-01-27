@@ -4,9 +4,8 @@ const express = require('express');
 const app = express();
 const mongoose = require('mongoose');
 const multer = require('multer');
-const path = require('path');
 const cors = require('cors');
-const cloudinary = require('cloudinary').v2; 
+const cloudinary = require('cloudinary').v2;
 const { CloudinaryStorage } = require('multer-storage-cloudinary');
 
 // Middleware
@@ -14,26 +13,27 @@ app.use(express.json());
 app.use(cors());
 
 // Connexion à MongoDB avec un délai d'attente augmenté
-mongoose.connect('mongodb+srv://mohammedbetkaoui:27032002@cluster0.e51v8.mongodb.net/E-commerce', {
+mongoose.connect(process.env.MONGODB_URI || 'mongodb+srv://mohammedbetkaoui:27032002@cluster0.e51v8.mongodb.net/E-commerce', {
   serverSelectionTimeoutMS: 30000, // 30 secondes
 })
   .then(() => console.log('Connecté à MongoDB avec succès'))
   .catch(err => console.error('Erreur de connexion à MongoDB :', err));
+
 // Configuration de Cloudinary
 cloudinary.config({
-  cloud_name: 'dr285qsky', // Remplacez par votre cloud_name
-  api_key: '941595523261627', // Remplacez par votre api_key
-  api_secret: 'ovLhMgw92fdWSB9kaQauOhYdIsE' // Remplacez par votre api_secret
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME || 'dr285qsky',
+  api_key: process.env.CLOUDINARY_API_KEY || '941595523261627',
+  api_secret: process.env.CLOUDINARY_API_SECRET || 'ovLhMgw92fdWSB9kaQauOhYdIsE',
 });
 
 // Configuration du stockage des images avec Multer et Cloudinary
 const storage = new CloudinaryStorage({
   cloudinary: cloudinary,
   params: {
-    folder: 'e-commerce', // Dossier dans Cloudinary où les images seront stockées
-    format: async (req, file) => 'png', // Format de l'image
-    public_id: (req, file) => `product_${Date.now()}` // Nom du fichier dans Cloudinary
-  }
+    folder: 'e-commerce',
+    format: async (req, file) => 'png',
+    public_id: (req, file) => `product_${Date.now()}`,
+  },
 });
 
 const upload = multer({ storage: storage });
@@ -49,12 +49,12 @@ app.post('/upload', upload.single('product'), async (req, res) => {
   // Optimiser l'URL de l'image avec Cloudinary
   const optimizeUrl = cloudinary.url(req.file.filename, {
     fetch_format: 'auto',
-    quality: 'auto'
+    quality: 'auto',
   });
 
   res.json({
     success: 1,
-    image_url: optimizeUrl // URL optimisée de l'image sur Cloudinary
+    image_url: optimizeUrl,
   });
 });
 
@@ -80,6 +80,7 @@ const Product = mongoose.model('Product', {
   date: { type: Date, default: Date.now, required: true },
   avilable: { type: Boolean, required: true, default: true },
 });
+
 // Route pour ajouter un produit
 app.post('/addproduct', async (req, res) => {
   let products = await Product.find({});
@@ -109,13 +110,13 @@ app.post('/addproduct', async (req, res) => {
   });
 });
 
-// Route pour récupérer tous les produits
+// Route pour récupérer tous les produits (sans l'image)
 app.get('/products', async (req, res) => {
   try {
-    const products = await Product.find({});
+    const products = await Product.find({}).select('-image');
     return res.json({ products });
   } catch (error) {
-    console.error('Error :', error);
+    console.error('Error fetching products:', error);
     return res.status(500).json({ success: false, message: 'Error fetching products' });
   }
 });
@@ -142,10 +143,3 @@ app.listen(port, (error) => {
     console.error('Erreur lors du démarrage du serveur :', error);
   }
 });
-
-
-
-
-
-
-
