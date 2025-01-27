@@ -113,7 +113,7 @@ app.post('/addproduct', async (req, res) => {
 // Route pour récupérer tous les produits (sans l'image)
 app.get('/products', async (req, res) => {
   try {
-    const products = await Product.find({}).select('-image');
+    const products = await Product.find({});
     return res.json({ products });
   } catch (error) {
     console.error('Error fetching products:', error);
