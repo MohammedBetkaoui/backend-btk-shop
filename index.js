@@ -136,18 +136,37 @@ app.get('/products', async (req, res) => {
 });
 
 // Route pour supprimer un produit
+// Route pour supprimer un produit
 app.post('/removeproduct', async (req, res) => {
   try {
+    // Trouver le produit à supprimer
     const product = await Product.findOneAndDelete({ id: req.body.id });
+
     if (!product) {
-      return res.status(404).json({ success: false, message: 'Product not found' });
+      return res.status(404).json({ success: false, message: 'Produit non trouvé' });
     }
-    return res.json({ success: true, message: 'Product deleted successfully' });
+
+    // Extraire le `public_id` de l'image à partir de l'URL Cloudinary
+    const imageUrl = product.image;
+    const publicId = imageUrl.split('/').pop().split('.')[0]; // Récupère le public_id depuis l'URL
+
+    // Supprimer l'image de Cloudinary
+    await cloudinary.uploader.destroy(`e-commerce/${publicId}`, (error, result) => {
+      if (error) {
+        console.error('Erreur lors de la suppression de l\'image sur Cloudinary :', error);
+      } else {
+        console.log('Image supprimée de Cloudinary :', result);
+      }
+    });
+
+    // Réponse de succès
+    return res.json({ success: true, message: 'Produit et image supprimés avec succès' });
   } catch (error) {
-    console.error('Error removing product:', error);
-    return res.status(500).json({ success: false, message: 'Error removing product' });
+    console.error('Erreur lors de la suppression du produit :', error);
+    return res.status(500).json({ success: false, message: 'Erreur lors de la suppression du produit' });
   }
 });
+
 
 // Démarrer le serveur
 app.listen(port, (error) => {
