@@ -30,32 +30,45 @@ cloudinary.config({
 const storage = new CloudinaryStorage({
   cloudinary: cloudinary,
   params: {
-    folder: 'e-commerce',
-    format: async (req, file) => 'png',
-    public_id: (req, file) => `product_${Date.now()}`,
+    folder: 'e-commerce', // Dossier dans Cloudinary
+    format: async (req, file) => file.mimetype.split('/')[1], // Conserve le format original (jpg, png, etc.)
+    public_id: (req, file) => `product_${Date.now()}`, // Nom unique basé sur l'horodatage
   },
 });
 
-const upload = multer({ storage: storage });
+// Autoriser uniquement les types d'images
+const upload = multer({
+  storage: storage,
+  fileFilter: (req, file, cb) => {
+    const fileTypes = /jpeg|jpg|png|gif|webp|bmp|tiff/; // Types MIME acceptés
+    const mimeType = fileTypes.test(file.mimetype); // Vérifie le type MIME
+    const extName = fileTypes.test(file.originalname.toLowerCase()); // Vérifie l'extension du fichier
+    if (mimeType && extName) {
+      cb(null, true); // Accepter le fichier
+    } else {
+      cb(new Error('Seuls les types d\'images (JPEG, PNG, GIF, etc.) sont autorisés')); // Rejeter
+    }
+  },
+});
 
 // Route pour l'upload d'images
 app.post('/upload', upload.single('product'), async (req, res) => {
-  if (!req.file) {
-    console.log('Aucun fichier reçu');
-    return res.status(400).json({ success: 0, message: 'Aucun fichier reçu' });
+  try {
+    if (!req.file) {
+      return res.status(400).json({ success: 0, message: 'Aucun fichier reçu' });
+    }
+
+    // URL publique de l'image stockée sur Cloudinary
+    const imageUrl = req.file.path;
+
+    res.json({
+      success: 1,
+      image_url: imageUrl,
+    });
+  } catch (error) {
+    console.error('Erreur lors de l\'upload :', error);
+    res.status(500).json({ success: 0, message: error.message });
   }
-  console.log('Fichier reçu :', req.file);
-
-  // Optimiser l'URL de l'image avec Cloudinary
-  const optimizeUrl = cloudinary.url(req.file.filename, {
-    fetch_format: 'auto',
-    quality: 'auto',
-  });
-
-  res.json({
-    success: 1,
-    image_url: optimizeUrl,
-  });
 });
 
 // Route de test
@@ -82,32 +95,33 @@ const Product = mongoose.model('Product', {
 });
 
 // Route pour ajouter un produit
-app.post('/addproduct', async (req, res) => {
-  let products = await Product.find({});
-  let id;
-  if (products.length > 0) {
-    let last_product_array = products.slice(-1);
-    let last_product = last_product_array[0];
-    id = last_product.id + 1;
-  } else {
-    id = 1;
-  }
-  const product = new Product({
-    id: id,
-    name: req.body.name,
-    image: req.body.image,
-    category: req.body.category,
-    new_price: req.body.new_price,
-    old_price: req.body.old_price,
-  });
-  console.log(product);
+app.post('/addproduct', upload.single('image'), async (req, res) => {
+  try {
+    // Vérifier l'image uploadée
+    if (!req.file) {
+      return res.status(400).json({ success: false, message: 'Aucune image reçue' });
+    }
 
-  await product.save();
-  console.log('Product added successfully');
-  res.json({
-    success: true,
-    name: req.body.name,
-  });
+    // Générer un nouvel ID pour le produit
+    const products = await Product.find({});
+    const id = products.length > 0 ? products[products.length - 1].id + 1 : 1;
+
+    // Créer un nouveau produit avec l'URL d'image Cloudinary
+    const product = new Product({
+      id: id,
+      name: req.body.name,
+      image: req.file.path, // URL publique générée par Cloudinary
+      category: req.body.category,
+      new_price: req.body.new_price,
+      old_price: req.body.old_price,
+    });
+
+    await product.save();
+    res.json({ success: true, product });
+  } catch (error) {
+    console.error('Erreur lors de l\'ajout du produit :', error);
+    res.status(500).json({ success: false, message: 'Erreur interne du serveur' });
+  }
 });
 
 // Route pour récupérer tous les produits (sans l'image)
