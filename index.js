@@ -1,5 +1,4 @@
 const port = 4000;
-
 const express = require('express');
 const app = express();
 const mongoose = require('mongoose');
@@ -90,6 +89,7 @@ const Product = mongoose.model('Product', {
   category: { type: String, required: true },
   new_price: { type: Number, required: true },
   old_price: { type: Number, required: true },
+  description: { type: String, required: true }, // Ajout de la description
   date: { type: Date, default: Date.now, required: true },
   avilable: { type: Boolean, required: true, default: true },
 });
@@ -97,23 +97,21 @@ const Product = mongoose.model('Product', {
 // Route pour ajouter un produit
 app.post('/addproduct', upload.single('image'), async (req, res) => {
   try {
-    // Vérifier l'image uploadée
     if (!req.file) {
       return res.status(400).json({ success: false, message: 'Aucune image reçue' });
     }
 
-    // Générer un nouvel ID pour le produit
     const products = await Product.find({});
     const id = products.length > 0 ? products[products.length - 1].id + 1 : 1;
 
-    // Créer un nouveau produit avec l'URL d'image Cloudinary
     const product = new Product({
       id: id,
       name: req.body.name,
-      image: req.file.path, // URL publique générée par Cloudinary
+      image: req.file.path,
       category: req.body.category,
       new_price: req.body.new_price,
       old_price: req.body.old_price,
+      description: req.body.description, // Ajout de la description
     });
 
     await product.save();
@@ -124,7 +122,7 @@ app.post('/addproduct', upload.single('image'), async (req, res) => {
   }
 });
 
-// Route pour récupérer tous les produits (sans l'image)
+// Route pour récupérer tous les produits
 app.get('/products', async (req, res) => {
   try {
     const products = await Product.find({});
@@ -136,37 +134,34 @@ app.get('/products', async (req, res) => {
 });
 
 // Route pour supprimer un produit
-// Route pour supprimer un produit
-app.post('/removeproduct', async (req, res) => {
+app.post('/addproduct', upload.single('image'), async (req, res) => {
   try {
-    // Trouver le produit à supprimer
-    const product = await Product.findOneAndDelete({ id: req.body.id });
-
-    if (!product) {
-      return res.status(404).json({ success: false, message: 'Produit non trouvé' });
+    if (!req.file) {
+      return res.status(400).json({ success: false, message: 'Aucune image reçue' });
     }
 
-    // Extraire le `public_id` de l'image à partir de l'URL Cloudinary
-    const imageUrl = product.image;
-    const publicId = imageUrl.split('/').pop().split('.')[0]; // Récupère le public_id depuis l'URL
+    console.log('Données reçues :', req.body); // Affiche les données reçues
 
-    // Supprimer l'image de Cloudinary
-    await cloudinary.uploader.destroy(`e-commerce/${publicId}`, (error, result) => {
-      if (error) {
-        console.error('Erreur lors de la suppression de l\'image sur Cloudinary :', error);
-      } else {
-        console.log('Image supprimée de Cloudinary :', result);
-      }
+    const products = await Product.find({});
+    const id = products.length > 0 ? products[products.length - 1].id + 1 : 1;
+
+    const product = new Product({
+      id: id,
+      name: req.body.name,
+      image: req.file.path,
+      category: req.body.category,
+      new_price: req.body.new_price,
+      old_price: req.body.old_price,
+      description: req.body.description, // Assurez-vous que cette ligne est présente
     });
 
-    // Réponse de succès
-    return res.json({ success: true, message: 'Produit et image supprimés avec succès' });
+    await product.save();
+    res.json({ success: true, product });
   } catch (error) {
-    console.error('Erreur lors de la suppression du produit :', error);
-    return res.status(500).json({ success: false, message: 'Erreur lors de la suppression du produit' });
+    console.error('Erreur lors de l\'ajout du produit :', error);
+    res.status(500).json({ success: false, message: 'Erreur interne du serveur' });
   }
 });
-
 
 // Démarrer le serveur
 app.listen(port, (error) => {
