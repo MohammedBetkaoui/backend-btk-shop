@@ -134,32 +134,33 @@ app.get('/products', async (req, res) => {
 });
 
 // Route pour supprimer un produit
-app.post('/addproduct', upload.single('image'), async (req, res) => {
+app.post('/removeproduct', async (req, res) => {
   try {
-    if (!req.file) {
-      return res.status(400).json({ success: false, message: 'Aucune image reçue' });
+    // Trouver le produit à supprimer
+    const product = await Product.findOneAndDelete({ id: req.body.id });
+
+    if (!product) {
+      return res.status(404).json({ success: false, message: 'Produit non trouvé' });
     }
 
-    console.log('Données reçues :', req.body); // Affiche les données reçues
+    // Extraire le `public_id` de l'image à partir de l'URL Cloudinary
+    const imageUrl = product.image;
+    const publicId = imageUrl.split('/').pop().split('.')[0]; // Récupère le public_id depuis l'URL
 
-    const products = await Product.find({});
-    const id = products.length > 0 ? products[products.length - 1].id + 1 : 1;
-
-    const product = new Product({
-      id: id,
-      name: req.body.name,
-      image: req.file.path,
-      category: req.body.category,
-      new_price: req.body.new_price,
-      old_price: req.body.old_price,
-      description: req.body.description, // Assurez-vous que cette ligne est présente
+    // Supprimer l'image de Cloudinary
+    await cloudinary.uploader.destroy(`e-commerce/${publicId}`, (error, result) => {
+      if (error) {
+        console.error('Erreur lors de la suppression de l\'image sur Cloudinary :', error);
+      } else {
+        console.log('Image supprimée de Cloudinary :', result);
+      }
     });
 
-    await product.save();
-    res.json({ success: true, product });
+    // Réponse de succès
+    return res.json({ success: true, message: 'Produit et image supprimés avec succès' });
   } catch (error) {
-    console.error('Erreur lors de l\'ajout du produit :', error);
-    res.status(500).json({ success: false, message: 'Erreur interne du serveur' });
+    console.error('Erreur lors de la suppression du produit :', error);
+    return res.status(500).json({ success: false, message: 'Erreur lors de la suppression du produit' });
   }
 });
 
