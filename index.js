@@ -4,12 +4,14 @@ const cors = require('cors');
 const cloudinary = require('cloudinary').v2;
 const dotenv = require('dotenv');
 const Product = require('./models/Product');
-
+const auth = require('./middleware/auth');
 // Routes
 const addProductRoute = require('./routes/AddProduct');
 const removeProductRoute = require('./routes/RemoveProduct');
-const editProductRoute = require('./routes/editProduct');
-const loginRoute = require('./routes/login'); // Importer la route de login
+const editProductRoute = require('./routes/editProduct');  
+const loginRoute = require('./routes/login');
+
+
 
 dotenv.config(); // Charger les variables d'environnement
 
@@ -35,13 +37,16 @@ cloudinary.config({
 });
 
 // Routes
-app.use('/addproduct', addProductRoute);
-app.use('/removeproduct', removeProductRoute);
-app.use('/editproduct', editProductRoute);
-app.use('/login', loginRoute); // Utiliser la route de login
+app.use('/login', loginRoute);
+app.use('/addproduct',auth, addProductRoute);
+app.use('/removeproduct',auth, removeProductRoute);
+
+
+
+
 
 // Route pour récupérer tous les produits
-app.get('/products', async (req, res) => {
+app.get('/products',auth, async (req, res) => {
   try {
     const products = await Product.find({});
     return res.json({ products });
