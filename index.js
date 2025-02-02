@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const cloudinary = require('cloudinary').v2;
 const dotenv = require('dotenv');
+const Product = require('./models/Product');
 
 // Routes
 const addProductRoute = require('./routes/AddProduct');
@@ -36,6 +37,17 @@ cloudinary.config({
 app.use('/addproduct', addProductRoute);
 app.use('/removeproduct', removeProductRoute);
 app.use('/editproduct', editProductRoute);  // Utiliser la route pour modifier un produit
+
+// Route pour récupérer tous les produits
+app.get('/products', async (req, res) => {
+  try {
+    const products = await Product.find({});
+    return res.json({ products });
+  } catch (error) {
+    console.error('Error fetching products:', error);
+    return res.status(500).json({ success: false, message: 'Error fetching products' });
+  }
+});
 
 // Route de test
 app.get('/', (req, res) => {
