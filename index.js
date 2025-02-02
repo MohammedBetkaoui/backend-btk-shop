@@ -5,13 +5,11 @@ const cloudinary = require('cloudinary').v2;
 const dotenv = require('dotenv');
 const Product = require('./models/Product');
 const auth = require('./middleware/auth');
+
 // Routes
 const addProductRoute = require('./routes/AddProduct');
 const removeProductRoute = require('./routes/RemoveProduct');
-const editProductRoute = require('./routes/editProduct');  
 const loginRoute = require('./routes/login');
-
-
 
 dotenv.config(); // Charger les variables d'environnement
 
@@ -38,15 +36,11 @@ cloudinary.config({
 
 // Routes
 app.use('/login', loginRoute);
-app.use('/addproduct',auth, addProductRoute);
-app.use('/removeproduct',auth, removeProductRoute);
-
-
-
-
+app.use('/addproduct', auth, addProductRoute);
+app.use('/removeproduct', auth, removeProductRoute);
 
 // Route pour récupérer tous les produits
-app.get('/products',auth, async (req, res) => {
+app.get('/products', auth, async (req, res) => {
   try {
     const products = await Product.find({});
     return res.json({ products });
@@ -59,6 +53,12 @@ app.get('/products',auth, async (req, res) => {
 // Route de test
 app.get('/', (req, res) => {
   res.send('Le serveur Express fonctionne correctement');
+});
+
+// Gestion des erreurs
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).json({ success: false, message: 'Erreur interne du serveur' });
 });
 
 // Démarrer le serveur

@@ -2,8 +2,7 @@ const express = require('express');
 const multer = require('multer');
 const cloudinary = require('cloudinary').v2;
 const { CloudinaryStorage } = require('multer-storage-cloudinary');
-
-const Product = require('../models/Product'); // Assurez-vous que le modèle est défini
+const Product = require('../models/Product');
 
 const router = express.Router();
 
@@ -11,9 +10,9 @@ const router = express.Router();
 const storage = new CloudinaryStorage({
   cloudinary: cloudinary,
   params: {
-    folder: 'e-commerce', // Dossier dans Cloudinary
-    format: async (req, file) => file.mimetype.split('/')[1], // Conserve le format original
-    public_id: (req, file) => `product_${Date.now()}`, // Nom unique basé sur l'horodatage
+    folder: 'e-commerce',
+    format: async (req, file) => file.mimetype.split('/')[1],
+    public_id: (req, file) => `product_${Date.now()}`,
   },
 });
 
@@ -48,7 +47,7 @@ router.post('/', upload.single('image'), async (req, res) => {
       category: req.body.category,
       new_price: req.body.new_price,
       old_price: req.body.old_price,
-      description: req.body.description, // Ajout de la description
+      description: req.body.description,
     });
 
     await product.save();
