@@ -31,43 +31,30 @@ const upload = multer({
 });
 
 // Route pour modifier un produit
+// Route pour modifier un produit
 router.put('/:id', upload.single('image'), async (req, res) => {
-  try {
-    const productId = req.params.id;
-
-    // Recherche du produit existant
-    const product = await Product.findOne({ id: productId });
-    if (!product) {
-      return res.status(404).json({ success: false, message: 'Produit non trouvé' });
+    try {
+      const { name, description, price, category } = req.body;
+      const product = await Product.findById(req.params.id);
+      if (!product) {
+        return res.status(404).json({ success: false, message: 'Produit non trouvé' });
+      }
+  
+      product.name = name;
+      product.description = description;
+      product.price = price;
+      product.category = category;
+      if (req.file) {
+        product.image = req.file.path;
+      }
+  
+      await product.save();
+      res.json({ success: true, message: 'Produit mis à jour', product });
+    } catch (error) {
+      console.error('Erreur lors de la modification du produit :', error);
+      res.status(500).json({ success: false, message: 'Erreur interne du serveur' });
     }
-
-    // Si une nouvelle image est reçue, supprimer l'ancienne image de Cloudinary
-    if (req.file) {
-      const imageUrl = product.image;
-      const publicId = imageUrl.split('/').pop().split('.')[0]; // Extraire l'ID public de l'URL
-
-      // Supprimer l'ancienne image de Cloudinary
-      await cloudinary.uploader.destroy(`e-commerce/${publicId}`);
-
-      // Mettre à jour le chemin de l'image avec la nouvelle
-      product.image = req.file.path;
-    }
-
-    // Mettre à jour les autres informations du produit
-    product.name = req.body.name || product.name;
-    product.category = req.body.category || product.category;
-    product.new_price = req.body.new_price || product.new_price;
-    product.old_price = req.body.old_price || product.old_price;
-    product.description = req.body.description || product.description;
-
-    // Sauvegarder les modifications
-    await product.save();
-
-    res.json({ success: true, product });
-  } catch (error) {
-    console.error('Erreur lors de la modification du produit :', error);
-    res.status(500).json({ success: false, message: 'Erreur interne du serveur' });
-  }
-});
-
-module.exports = router;
+  });
+  
+  module.exports = router;
+  
