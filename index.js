@@ -8,7 +8,8 @@ const Product = require('./models/Product');
 // Routes
 const addProductRoute = require('./routes/AddProduct');
 const removeProductRoute = require('./routes/RemoveProduct');
-const editProductRoute = require('./routes/editProduct');  
+const editProductRoute = require('./routes/editProduct');
+const loginRoute = require('./routes/login'); // Importer la route de login
 
 dotenv.config(); // Charger les variables d'environnement
 
@@ -36,7 +37,8 @@ cloudinary.config({
 // Routes
 app.use('/addproduct', addProductRoute);
 app.use('/removeproduct', removeProductRoute);
-app.use('/editproduct', editProductRoute);  // Utiliser la route pour modifier un produit
+app.use('/editproduct', editProductRoute);
+app.use('/login', loginRoute); // Utiliser la route de login
 
 // Route pour récupérer tous les produits
 app.get('/products', async (req, res) => {
