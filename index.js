@@ -46,13 +46,39 @@ app.use('/register', registerRoute);
 app.use('/userlogin', userLoginRoute);
 
 // Route pour récupérer tous les produits
-app.get('/products', auth, async (req, res) => {
+app.get('/products', async (req, res) => {
   try {
     const products = await Product.find({});
     return res.json({ products });
   } catch (error) {
     console.error('Error fetching products:', error);
     return res.status(500).json({ success: false, message: 'Error fetching products' });
+  }
+});
+
+app.post('/cart', auth, async (req, res) => {
+  const { productId, quantity } = req.body;
+  const userId = req.user.id;
+
+  try {
+    // Mettre à jour le panier dans la base de données
+    await User.findByIdAndUpdate(userId, { $set: { [`cart.${productId}`]: quantity } });
+    res.json({ success: true });
+  } catch (error) {
+    console.error('Erreur lors de la mise à jour du panier:', error);
+    res.status(500).json({ success: false, message: 'Erreur lors de la mise à jour du panier' });
+  }
+});
+
+app.get('/cart', auth, async (req, res) => {
+  const userId = req.user.id;
+
+  try {
+    const user = await User.findById(userId);
+    res.json({ cart: user.cart || {} });
+  } catch (error) {
+    console.error('Erreur lors de la récupération du panier:', error);
+    res.status(500).json({ success: false, message: 'Erreur lors de la récupération du panier' });
   }
 });
 
