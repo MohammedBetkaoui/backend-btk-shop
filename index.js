@@ -10,6 +10,10 @@ const auth = require('./middleware/auth');
 const addProductRoute = require('./routes/AddProduct');
 const removeProductRoute = require('./routes/RemoveProduct');
 const loginRoute = require('./routes/login');
+const registerRoute = require('./routes/register');
+const userLoginRoute = require('./routes/userLogin');
+
+
 
 dotenv.config(); // Charger les variables d'environnement
 
@@ -38,6 +42,8 @@ cloudinary.config({
 app.use('/login', loginRoute);
 app.use('/addproduct', auth, addProductRoute);
 app.use('/removeproduct', auth, removeProductRoute);
+app.use('/register', registerRoute);
+app.use('/userlogin', userLoginRoute);
 
 // Route pour récupérer tous les produits
 app.get('/products', auth, async (req, res) => {
