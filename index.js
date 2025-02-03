@@ -58,7 +58,7 @@ app.get('/products', async (req, res) => {
 
 app.post('/cart', auth, async (req, res) => {
   const { productId, quantity } = req.body;
-  const userId = req.user._id;
+  const userId = req.user.id;
 
   try {
     // Mettre à jour le panier dans la base de données
@@ -71,7 +71,7 @@ app.post('/cart', auth, async (req, res) => {
 });
 
 app.get('/cart', auth, async (req, res) => {
-  const userId = req.user._id;
+  const userId = req.user.id;
 
   try {
     const user = await User.findById(userId);

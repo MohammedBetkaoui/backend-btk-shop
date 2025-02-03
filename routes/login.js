@@ -23,7 +23,7 @@ router.post('/', async (req, res) => {
     }
 
     // 3. Générer un token JWT si les identifiants sont valides
-    const token = jwt.sign({ id: admin._id }, process.env.JWT_SECRET || 'votre_secret_jwt', {
+    const token = jwt.sign({ id: admin.id }, process.env.JWT_SECRET || 'votre_secret_jwt', {
       expiresIn: '1h', // Le token expire dans 1 heure
     });
 

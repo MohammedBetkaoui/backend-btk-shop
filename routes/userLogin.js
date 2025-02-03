@@ -19,11 +19,11 @@ router.post('/', async (req, res) => {
       return res.status(401).json({ success: false, message: 'Identifiants invalides' });
     }
 
-    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET || 'votre_secret_jwt', {
+    const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET || 'votre_secret_jwt', {
       expiresIn: '7d'
     });
 
-    res.json({ success: true, token, user: { id: user._id, username: user.username, email } });
+    res.json({ success: true, token, user: { id: user.id, username: user.username, email } });
   } catch (error) {
     console.error('Erreur lors de la connexion :', error);
     res.status(500).json({ success: false, message: 'Erreur serveur' });

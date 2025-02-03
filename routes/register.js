@@ -15,15 +15,18 @@ router.post('/', async (req, res) => {
     }
 
     // Créer un nouvel utilisateur
-    const newUser = new User({ username, email, password });
+    const User = await User.find({});
+    const id = User.length > 0 ? User[User.length - 1].id + 1 : 1;
+
+    const newUser = new User({ id,username, email, password });
     await newUser.save();
 
     // Générer un token JWT
-    const token = jwt.sign({ id: newUser._id }, process.env.JWT_SECRET || 'votre_secret_jwt', {
+    const token = jwt.sign({ id: newUser.id }, process.env.JWT_SECRET || 'votre_secret_jwt', {
       expiresIn: '7d'
     });
 
-    res.status(201).json({ success: true, token, user: { id: newUser._id, username, email } });
+    res.status(201).json({ success: true, token, user: { id: newUser.id, username, email } });
   } catch (error) {
     console.error('Erreur lors de l’inscription :', error);
     res.status(500).json({ success: false, message: 'Erreur serveur' });
