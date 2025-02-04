@@ -4,6 +4,7 @@ const cors = require('cors');
 const cloudinary = require('cloudinary').v2;
 const dotenv = require('dotenv');
 const Product = require('./models/Product');
+const User = require('./models/User');
 const auth = require('./middleware/auth');
 
 // Routes
@@ -53,6 +54,15 @@ app.get('/products', async (req, res) => {
   } catch (error) {
     console.error('Error fetching products:', error);
     return res.status(500).json({ success: false, message: 'Error fetching products' });
+  }
+});
+// Dans index.js
+app.get('/users', async (req, res) => {
+  try {
+    const users = await User.find({});
+    res.json(users);
+  } catch (error) {
+    res.status(500).json({ message: 'Erreur lors de la récupération des utilisateurs' });
   }
 });
 
