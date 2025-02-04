@@ -103,6 +103,10 @@ app.delete('/users/:id', async (req, res) => {
   }
 });
 
+app.get('/', (req, res) => {
+  res.send('Le serveur Express fonctionne correctement');
+});
+
 // Gestion des erreurs
 app.use((err, req, res, next) => {
   console.error(err.stack);
@@ -112,3 +116,4 @@ app.use((err, req, res, next) => {
 server.listen(port, () => {
   console.log(`Serveur actif sur le port ${port}`);
 });
+
