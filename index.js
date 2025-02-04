@@ -41,7 +41,7 @@ cloudinary.config({
 // Routes
 app.use('/login', loginRoute);
 app.use('/addproduct', auth, addProductRoute);
-app.use('/removeproduct', auth, removeProductRoute);
+app.use('/removeproduct', removeProductRoute);
 app.use('/register', registerRoute);
 app.use('/userlogin', userLoginRoute);
 
