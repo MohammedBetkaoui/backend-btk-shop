@@ -11,7 +11,7 @@ router.post('/', async (req, res) => {
     // Vérifier si l'utilisateur existe déjà
     const existingUser = await User.findOne({ email });
     if (existingUser) {
-      return res.status(400).json({ success: false, message: 'Cet email est déjà utilisé' });
+      return res.status(400).json({ success: false, message: 'Cet email est déjà utilisé.' });
     }
 
     // Récupérer tous les utilisateurs pour générer un ID unique
