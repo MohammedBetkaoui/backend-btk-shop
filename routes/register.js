@@ -14,11 +14,12 @@ router.post('/', async (req, res) => {
       return res.status(400).json({ success: false, message: 'Cet email est déjà utilisé' });
     }
 
-    // Créer un nouvel utilisateur
-    const User = await User.find({});
-    const id = User.length > 0 ? User[User.length - 1].id + 1 : 1;
+    // Récupérer tous les utilisateurs pour générer un ID unique
+    const users = await User.find({});
+    const id = users.length > 0 ? users[users.length - 1].id + 1 : 1;
 
-    const newUser = new User({ id,username, email, password });
+    // Créer un nouvel utilisateur
+    const newUser = new User({ id, username, email, password });
     await newUser.save();
 
     // Générer un token JWT
