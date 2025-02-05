@@ -1,22 +1,40 @@
 const express = require('express');
 const auth = require('../middleware/auth');
-const User = require('../models/User');
+const { User, Product } = require('../models/Product');
 
 const router = express.Router();
 
 router.get('/', auth, async (req, res) => {
   try {
-    const userId = req.user._id;
-    const user = await User.findById(userId).populate('cart.productId');
+    const user = await User.findById(req.user._id)
+      .populate({
+        path: 'cart.productId',
+        model: 'Product',
+        select: 'id name new_price image' // Sélectionner les champs nécessaires
+      });
 
     if (!user) {
-      return res.status(404).json({ message: 'User not found' });
+      return res.status(404).json({ message: 'Utilisateur non trouvé' });
     }
 
-    res.json({ cart: user.cart });
+    // Formater la réponse pour le frontend
+    const formattedCart = user.cart.map(item => ({
+      productId: item.productId.id,
+      size: item.size,
+      quantity: item.quantity,
+      price: item.productId.new_price,
+      name: item.productId.name,
+      image: item.productId.image
+    }));
+
+    res.json({ cart: formattedCart });
+
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: 'Server error' });
+    console.error('Erreur:', error);
+    res.status(500).json({ 
+      message: 'Erreur serveur',
+      error: error.message 
+    });
   }
 });
 
