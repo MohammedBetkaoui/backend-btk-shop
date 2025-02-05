@@ -7,7 +7,7 @@ const router = express.Router();
 router.post('/', auth, async (req, res) => {
   try {
     const { productId, quantity, size } = req.body;
-    const userId = req.user.id;
+    const userId = req.user._id;
 
     const user = await User.findById(userId);
     if (!user) {

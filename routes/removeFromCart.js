@@ -7,7 +7,7 @@ const router = express.Router();
 router.delete('/', auth, async (req, res) => {
   try {
     const { productId, size } = req.body;
-    const userId = req.user.id;
+    const userId = req.user._id;
 
     const user = await User.findById(userId);
     if (!user) {
