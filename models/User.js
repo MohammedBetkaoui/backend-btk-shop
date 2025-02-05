@@ -6,10 +6,13 @@ const userSchema = new mongoose.Schema({
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
   createdAt: { type: Date, default: Date.now },
-  cart: { type: Object, default: {} },
+  cart: [{
+    productId: { type: mongoose.Schema.Types.ObjectId, ref: 'Product', required: true },
+    quantity: { type: Number, required: true, default: 1 },
+    size: { type: String, required: true },
+  }],
 });
 
-// Hachage du mot de passe avant sauvegarde
 userSchema.pre('save', async function (next) {
   if (!this.isModified('password')) return next();
   this.password = await bcrypt.hash(this.password, 10);

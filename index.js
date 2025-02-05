@@ -13,13 +13,15 @@ const removeProductRoute = require('./routes/RemoveProduct');
 const loginRoute = require('./routes/login');
 const registerRoute = require('./routes/register');
 const userLoginRoute = require('./routes/userLogin');
+const addToCartRoute = require('./routes/addToCart');
+const getCartRoute = require('./routes/getCart');
+const removeFromCartRoute = require('./routes/removeFromCart');
 
 
-
-dotenv.config(); // Charger les variables d'environnement
+dotenv.config();
 
 const app = express();
-const port = 4000;
+const port = process.env.PORT || 4000; // Use environment variable for port
 
 // Middleware
 app.use(express.json());
@@ -27,10 +29,10 @@ app.use(cors());
 
 // Connexion à MongoDB
 mongoose.connect(process.env.MONGODB_URI || 'mongodb+srv://mohammedbetkaoui:27032002@cluster0.e51v8.mongodb.net/E-commerce', {
-  serverSelectionTimeoutMS: 30000,
-})
-  .then(() => console.log('Connecté à MongoDB avec succès'))
-  .catch(err => console.error('Erreur de connexion à MongoDB :', err));
+    serverSelectionTimeoutMS: 30000,
+  })
+    .then(() => console.log('Connecté à MongoDB avec succès'))
+    .catch(err => console.error('Erreur de connexion à MongoDB :', err));
 
 // Configuration de Cloudinary
 cloudinary.config({
@@ -45,6 +47,9 @@ app.use('/addproduct', auth, addProductRoute);
 app.use('/removeproduct', removeProductRoute);
 app.use('/register', registerRoute);
 app.use('/userlogin', userLoginRoute);
+app.use('/cart', addToCartRoute);
+app.use('/cart', getCartRoute);
+app.use('/cart/remove', removeFromCartRoute);
 
 // Route pour récupérer tous les produits
 app.get('/products', async (req, res) => {
@@ -56,6 +61,7 @@ app.get('/products', async (req, res) => {
     return res.status(500).json({ success: false, message: 'Error fetching products' });
   }
 });
+
 // Dans index.js
 app.get('/users', async (req, res) => {
   try {

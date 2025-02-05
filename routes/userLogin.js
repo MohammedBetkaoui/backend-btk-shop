@@ -23,7 +23,7 @@ router.post('/', async (req, res) => {
       expiresIn: '7d'
     });
 
-    res.json({ success: true, token, user: { id: user.id, username: user.username, email } });
+    res.json({ success: true, token, user: { id: user.id, username: user.username, email, cart: user.cart } }); // Include cart in response
   } catch (error) {
     console.error('Erreur lors de la connexion :', error);
     res.status(500).json({ success: false, message: 'Erreur serveur' });
