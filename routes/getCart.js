@@ -1,23 +1,17 @@
 const express = require('express');
-const auth = require('../middleware/auth');
-const { User, Product } = require('../models/Product');
+const userAuth = require('../middleware/userAuth');
+const User = require('../models/User');
 
 const router = express.Router();
 
-router.get('/', auth, async (req, res) => {
+router.get('/', userAuth, async (req, res) => {
   try {
     const user = await User.findById(req.user._id)
       .populate({
         path: 'cart.productId',
-        model: 'Product',
-        select: 'id name new_price image' // Sélectionner les champs nécessaires
+        select: 'id name new_price image'
       });
 
-    if (!user) {
-      return res.status(404).json({ message: 'Utilisateur non trouvé' });
-    }
-
-    // Formater la réponse pour le frontend
     const formattedCart = user.cart.map(item => ({
       productId: item.productId.id,
       size: item.size,

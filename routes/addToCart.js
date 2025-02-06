@@ -1,15 +1,15 @@
 const express = require('express');
-const auth = require('../middleware/auth');
-const { User, Product } = require('../models/Product');
+const userAuth = require('../middleware/userAuth');
+const Product = require('../models/Product');
+const User = require('../models/User');
 
 const router = express.Router();
 
-router.post('/', auth, async (req, res) => {
+router.post('/', userAuth, async (req, res) => {
   try {
     const { productId: numericId, quantity, size } = req.body;
     const userId = req.user._id;
 
-    // Trouver le produit par ID numérique
     const product = await Product.findOne({ id: numericId });
     if (!product) {
       return res.status(404).json({ message: 'Produit non trouvé' });
@@ -20,7 +20,6 @@ router.post('/', auth, async (req, res) => {
       return res.status(404).json({ message: 'Utilisateur non trouvé' });
     }
 
-    // Utiliser l'ObjectId réel du produit
     const existingItem = user.cart.find(item => 
       item.productId.equals(product._id) && item.size === size
     );
@@ -37,7 +36,6 @@ router.post('/', auth, async (req, res) => {
 
     await user.save();
     
-    // Renvoyer les données formatées pour le frontend
     const populatedUser = await User.findById(userId).populate('cart.productId');
     const formattedCart = populatedUser.cart.map(item => ({
       productId: item.productId.id,
