@@ -16,6 +16,8 @@ const userLoginRoute = require('./routes/userLogin');
 const addToCartRoute = require('./routes/addToCart');
 const getCartRoute = require('./routes/getCart');
 const removeFromCartRoute = require('./routes/removeFromCart');
+const updateCartRoute = require('./routes/updateCart');
+
 
 
 dotenv.config();
@@ -49,6 +51,7 @@ app.use('/register', registerRoute);
 app.use('/userlogin', userLoginRoute);
 app.use('/cart', addToCartRoute);
 app.use('/cart', getCartRoute);
+app.use('/cart', updateCartRoute);
 app.use('/cart/remove', removeFromCartRoute);
 
 // Route pour récupérer tous les produits
