@@ -54,7 +54,10 @@ app.use('/cart/remove', removeFromCartRoute);
 // Route pour récupérer tous les produits
 app.get('/products', async (req, res) => {
   try {
-    const products = await Product.find({});
+    const products = await Product.find({})
+      .sort({ createdAt: -1 }) // Tri par date de création
+      .select('-__v'); // Exclure le champ version
+
     return res.json({ products });
   } catch (error) {
     console.error('Error fetching products:', error);

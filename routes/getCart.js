@@ -1,6 +1,7 @@
 const express = require('express');
 const userAuth = require('../middleware/userAuth');
 const User = require('../models/User');
+const Product = require('../models/Product');
 
 const router = express.Router();
 
@@ -9,7 +10,8 @@ router.get('/', userAuth, async (req, res) => {
     const user = await User.findById(req.user._id)
       .populate({
         path: 'cart.productId',
-        select: 'id name new_price image'
+        model: 'Product',
+        select: 'id name new_price image sizes'
       });
 
     const formattedCart = user.cart.map(item => ({
@@ -18,14 +20,15 @@ router.get('/', userAuth, async (req, res) => {
       quantity: item.quantity,
       price: item.productId.new_price,
       name: item.productId.name,
-      image: item.productId.image
+      image: item.productId.image,
+      availableSizes: item.productId.sizes
     }));
 
-    res.json({ cart: formattedCart });
-
+    res.json({ success: true, cart: formattedCart });
   } catch (error) {
     console.error('Erreur:', error);
     res.status(500).json({ 
+      success: false,
       message: 'Erreur serveur',
       error: error.message 
     });
