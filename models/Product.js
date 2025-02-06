@@ -8,7 +8,7 @@ const productSchema = new mongoose.Schema({
   new_price: { type: Number, required: true },
   old_price: { type: Number, required: true },
   description: String,
-  sizes: { type: [String], default: ['S', 'M', 'L'] },
+  sizes: { type: [String], default: ['S', 'M', 'L', 'XL', 'XXL'] },
   createdAt: { type: Date, default: Date.now }
 });
 
