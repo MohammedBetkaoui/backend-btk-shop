@@ -13,11 +13,10 @@ const userSchema = new mongoose.Schema({
   }],
 });
 
-// Hashage du mot de passe avant de sauvegarder l'utilisateur
 userSchema.pre('save', async function (next) {
   if (!this.isModified('password')) return next();
   this.password = await bcrypt.hash(this.password, 10);
   next();
 });
 
-module.exports = mongoose.model('User ', userSchema);
+module.exports = mongoose.model('User', userSchema);
