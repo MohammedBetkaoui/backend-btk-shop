@@ -36,5 +36,15 @@ router.post('/', userAuth, async (req, res) => {
     });
   }
 });
+// Route pour récupérer toutes les commandes
+router.get('/', async (req, res) => {
+  try {
+    const orders = await Order.find({}).populate('userId', 'username email');
+    res.json({ success: true, orders });
+  } catch (error) {
+    console.error('Erreur lors de la récupération des commandes :', error);
+    res.status(500).json({ success: false, message: 'Erreur serveur' });
+  }
+});
 
 module.exports = router;
