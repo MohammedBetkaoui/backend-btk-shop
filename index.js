@@ -20,6 +20,8 @@ const updateCartRoute = require('./routes/updateCart');
 const getUserCartRoute = require('./routes/getUserCart');
 const productsRoutes = require('./routes/products');
 const usersRoutes = require('./routes/users');
+const orderRoute = require('./routes/order');
+
 
 
 
@@ -60,6 +62,8 @@ app.use('/cart/remove', removeFromCartRoute);
 app.use('/admin/users/cart', getUserCartRoute);
 app.use('/products', productsRoutes);
 app.use('/users',auth, usersRoutes);
+app.use('/order', orderRoute);
+
 
 
 
