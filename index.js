@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const cloudinary = require('cloudinary').v2;
 const dotenv = require('dotenv');
-const Product = require('./models/Product');
+
 const User = require('./models/User');
 const auth = require('./middleware/auth');
 
@@ -18,6 +18,8 @@ const getCartRoute = require('./routes/getCart');
 const removeFromCartRoute = require('./routes/removeFromCart');
 const updateCartRoute = require('./routes/updateCart');
 const getUserCartRoute = require('./routes/getUserCart');
+const productsRoutes = require('./routes/products');
+const usersRoutes = require('./routes/users');
 
 
 
@@ -56,31 +58,12 @@ app.use('/cart', getCartRoute);
 app.use('/cart', updateCartRoute);
 app.use('/cart/remove', removeFromCartRoute);
 app.use('/admin/users/cart', getUserCartRoute);
+app.use('/products', productsRoutes);
+app.use('/users',auth, usersRoutes);
 
 
-// Route pour récupérer tous les produits
-app.get('/products', async (req, res) => {
-  try {
-    const products = await Product.find({})
-      .sort({ createdAt: -1 }) // Tri par date de création
-      .select('-__v'); // Exclure le champ version
 
-    return res.json({ products });
-  } catch (error) {
-    console.error('Error fetching products:', error);
-    return res.status(500).json({ success: false, message: 'Error fetching products' });
-  }
-});
 
-// Dans index.js
-app.get('/users', async (req, res) => {
-  try {
-    const users = await User.find({});
-    res.json(users);
-  } catch (error) {
-    res.status(500).json({ message: 'Erreur lors de la récupération des utilisateurs' });
-  }
-});
 
 
 // Route de test
