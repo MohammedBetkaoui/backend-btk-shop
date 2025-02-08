@@ -17,6 +17,8 @@ const addToCartRoute = require('./routes/addToCart');
 const getCartRoute = require('./routes/getCart');
 const removeFromCartRoute = require('./routes/removeFromCart');
 const updateCartRoute = require('./routes/updateCart');
+const getUserCartRoute = require('./routes/getUserCart');
+
 
 
 
@@ -53,6 +55,8 @@ app.use('/cart', addToCartRoute);
 app.use('/cart', getCartRoute);
 app.use('/cart', updateCartRoute);
 app.use('/cart/remove', removeFromCartRoute);
+app.use('/admin/users/cart', getUserCartRoute);
+
 
 // Route pour récupérer tous les produits
 app.get('/products', async (req, res) => {
