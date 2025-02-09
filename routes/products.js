@@ -16,5 +16,17 @@ router.get('/', async (req, res) => {
     return res.status(500).json({ success: false, message: 'Error fetching products' });
   }
 });
+router.get('/:id', async (req, res) => {
+  try {
+    const product = await Product.findOne({ id: req.params.id });
+    if (!product) {
+      return res.status(404).json({ success: false, message: 'Product not found' });
+    }
+    res.json({ success: true, product });
+  } catch (error) {
+    console.error('Error fetching product:', error);
+    res.status(500).json({ success: false, message: 'Server error' });
+  }
+});
 
 module.exports = router;
