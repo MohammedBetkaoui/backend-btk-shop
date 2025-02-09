@@ -1,17 +1,21 @@
+// middleware/auth.js
 const jwt = require('jsonwebtoken');
 
-module.exports = function(req, res, next) {
-    // récupérer le token depuis Authorization header
-    const authHeader = req.header('Authorization');
-    if (!authHeader) return res.status(401).json({ message: 'Accès refusé' });
+const auth = (req, res, next) => {
+  const token = req.header('Authorization')?.replace('Bearer ', '');
 
-    const token = authHeader.split(' ')[1]; // Format: "Bearer <token>"
-    
-    try {
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        req.user = decoded;
-        next();
-    } catch (ex) {
-        res.status(400).json({ message: 'Token invalide' });
-    }
+  if (!token) {
+    return res.status(401).json({ success: false, message: 'Accès non autorisé' });
+  }
+
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'votre_secret_jwt');
+    req.adminId = decoded.id; // Ajoute l'ID de l'admin à la requête
+    next();
+  } catch (error) {
+    console.error('Erreur de vérification du token :', error);
+    res.status(401).json({ success: false, message: 'Token invalide' });
+  }
 };
+
+module.exports = auth;
