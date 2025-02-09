@@ -21,6 +21,8 @@ const getUserCartRoute = require('./routes/getUserCart');
 const productsRoutes = require('./routes/products');
 const usersRoutes = require('./routes/users');
 const orderRoute = require('./routes/order');
+const updateProductRoute = require('./routes/UpdateProduct');
+
 
 
 
@@ -63,6 +65,8 @@ app.use('/admin/users/cart', getUserCartRoute);
 app.use('/products', productsRoutes);
 app.use('/users',auth, usersRoutes);
 app.use('/order', orderRoute);
+app.use('/updateproduct', auth, updateProductRoute);
+
 
 
 
