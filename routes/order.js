@@ -2,6 +2,7 @@ const express = require('express');
 const userAuth = require('../middleware/userAuth');
 const Order = require('../models/Order');
 const User = require('../models/User');
+const { io } = require('../index'); // Importez l'instance de Socket.IO
 
 const router = express.Router();
 
@@ -23,6 +24,14 @@ router.post('/', userAuth, async (req, res) => {
     // Vider le panier de l'utilisateur
     await User.findByIdAndUpdate(userId, { $set: { cart: [] } });
 
+    // Envoyer une notification en temps réel
+    io.emit('newOrder', {
+      message: 'Nouvelle commande reçue !',
+      orderId: order._id,
+      totalAmount: order.totalAmount,
+      createdAt: order.createdAt,
+    });
+
     res.status(201).json({ 
       success: true, 
       order,
@@ -36,6 +45,8 @@ router.post('/', userAuth, async (req, res) => {
     });
   }
 });
+
+
 // Route pour récupérer toutes les commandes
 router.get('/', async (req, res) => {
   try {
