@@ -3,8 +3,6 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const cloudinary = require('cloudinary').v2;
 const dotenv = require('dotenv');
-const http = require('http');
-const { Server } = require('socket.io');
 
 const User = require('./models/User');
 const auth = require('./middleware/auth');
@@ -68,28 +66,7 @@ app.use('/order', orderRoute);
 
 
 
-const server = http.createServer(app);
-const io = new Server(server, {
-  cors: {
-    origin: "http://localhost:5173", // Remplacez par l'URL de votre frontend
-    methods: ["GET", "POST"],
-  },
-});
 
-// Écouter les connexions des clients
-io.on('connection', (socket) => {
-  console.log('Un client est connecté:', socket.id);
-
-  // Gérer la déconnexion
-  socket.on('disconnect', () => {
-    console.log('Un client est déconnecté:', socket.id);
-  });
-});
-
-// Démarrer le serveur
-// server.listen(4000, () => {
-//   console.log('Serveur démarré sur le port 4000');
-// });
 
 
 
