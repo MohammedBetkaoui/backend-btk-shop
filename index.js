@@ -25,7 +25,11 @@ const updateProductRoute = require('./routes/UpdateProduct');
 
 
 
-
+app.use(cors({
+  origin: 'https://btk-shop-admin.vercel.app',
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
 
 
 dotenv.config();
