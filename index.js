@@ -64,7 +64,7 @@ app.use('/cart/remove', removeFromCartRoute);
 app.use('/admin/users/cart', getUserCartRoute);
 app.use('/products', productsRoutes);
 app.use('/users',auth, usersRoutes);
-app.use('/order', orderRoute);
+app.use('/order',auth, orderRoute);
 app.use('/updateproduct', auth, updateProductRoute);
 
 

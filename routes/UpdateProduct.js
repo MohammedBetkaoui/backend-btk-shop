@@ -4,7 +4,7 @@ const Product = require('../models/Product');
 const auth = require('../middleware/auth');
 const cloudinary = require('cloudinary').v2;
 
-router.put('/updateproduct/:id', auth, async (req, res) => {
+router.put('/:id', auth, async (req, res) => {
     try {
         const { id } = req.params;
         const updates = req.body;
