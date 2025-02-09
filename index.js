@@ -25,17 +25,21 @@ const updateProductRoute = require('./routes/UpdateProduct');
 
 
 
-app.use(cors({
-  origin: 'https://btk-shop-admin.vercel.app',
-  methods: ['GET', 'POST', 'PUT', 'DELETE'],
-  allowedHeaders: ['Content-Type', 'Authorization']
-}));
 
 
 dotenv.config();
 
 const app = express();
 const port = process.env.PORT || 4000; // Use environment variable for port
+
+
+
+
+app.use(cors({
+  origin: 'https://btk-shop-admin.vercel.app',
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
 
 // Middleware
 app.use(express.json());
